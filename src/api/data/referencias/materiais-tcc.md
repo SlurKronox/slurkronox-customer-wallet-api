@@ -35,6 +35,6 @@ Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
 - ID: `897 9055 8621`
 - Senha: `TECHERS`
 
-## JSON de referência
+## JSON de referencia
 
 - [`src/api/data/referencias/customer-wallets.json`](src/api/data/referencias/customer-wallets.json)
