@@ -1,13 +1,13 @@
 # Kronox Customer Wallet Core API
 
-API Node.js com Express para gerenciamento de usuarios e consulta de customers (wallets).
+API Node.js com Express para gerenciamento de usuarios e customers (wallets).
 
 ## Objetivo
 
 Este projeto entrega:
 
 - CRUD completo de usuarios em memoria
-- Leitura de customers a partir de JSON de referencia
+- CRUD de customers em memoria com carga inicial de JSON de referencia
 - Estrutura por camadas para facilitar manutencao (`routes`, `controllers`, `services`, `data`, `validators`)
 - Testes automatizados com `node:test`
 
@@ -49,6 +49,7 @@ src/
         materiais-tcc.md
     validators/
       usuarios-validador.js
+      customers-validador.js
       index.js
   config/
     default.json
@@ -67,6 +68,9 @@ src/
 tests/
   usuarios.api.test.js
   customers.api.test.js
+postman/
+  Kronox-Customer-Wallet-Core.postman_collection.json
+  Kronox-Customer-Wallet-Core.postman_environment.json
 ```
 
 ## Como rodar
@@ -111,16 +115,25 @@ Prioridade da porta:
 2. `server.port` no config
 3. fallback `3000`
 
+Comportamento em `EADDRINUSE`:
+
+- Se `PORT` nao for definida, a API tenta automaticamente a proxima porta livre (ate `3020`).
+- Se `PORT` for definida e estiver ocupada, a API encerra com erro claro.
+
 ## Endpoints
+
+Prefixo de versao:
+
+- `/api/v1`
 
 ### Usuarios
 
-- `GET /usuarios`
-- `GET /usuarios/:id`
-- `POST /usuarios`
-- `PUT /usuarios/:id`
-- `PATCH /usuarios/:id`
-- `DELETE /usuarios/:id`
+- `GET /api/v1/usuarios`
+- `GET /api/v1/usuarios/:id`
+- `POST /api/v1/usuarios`
+- `PUT /api/v1/usuarios/:id`
+- `PATCH /api/v1/usuarios/:id`
+- `DELETE /api/v1/usuarios/:id`
 
 Campos de usuario:
 
@@ -131,12 +144,16 @@ Campos de usuario:
 
 ### Customers
 
-- `GET /customers`
-- `GET /customers/:id`
+- `GET /api/v1/customers`
+- `GET /api/v1/customers/:id`
+- `POST /api/v1/customers`
+- `PUT /api/v1/customers/:id`
+- `PATCH /api/v1/customers/:id`
+- `DELETE /api/v1/customers/:id`
 
 Origem dos dados:
 
-- `src/api/data/referencias/customer-wallets.json`
+- carga inicial de `src/api/data/referencias/customer-wallets.json`
 
 ## Comportamento de erro
 
@@ -148,7 +165,23 @@ Origem dos dados:
 ## Limites atuais
 
 - Usuarios sao mantidos em memoria (reiniciar servidor perde dados).
-- Customers sao somente leitura a partir de JSON local.
+- Customers sao mantidos em memoria apos a carga inicial do JSON (reiniciar servidor restaura o estado inicial).
+
+## Postman
+
+Arquivos prontos para importacao:
+
+- `postman/Kronox-Customer-Wallet-Core.postman_collection.json`
+- `postman/Kronox-Customer-Wallet-Core.postman_environment.json`
+
+Passos:
+
+1. Abrir Postman.
+2. Importar os dois arquivos.
+3. Selecionar o environment `Kronox Customer Wallet Core - Local`.
+4. Ajustar `baseUrl` se o servidor subir em porta diferente de `3000`.
+`baseUrl` ja vem como `http://localhost:3000/api/v1`.
+5. Para fluxo completo de customers, execute na ordem da collection (o `customerIdCriado` e preenchido automaticamente apos o `POST`).
 
 ## Documentacao detalhada
 

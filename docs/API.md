@@ -2,16 +2,16 @@
 
 Base URL local:
 
-- `http://localhost:3000`
+- `http://localhost:3000/api/v1`
 
 ## Health basica
 
 Sem endpoint dedicado de healthcheck no momento.
-Use `GET /usuarios` para validar disponibilidade funcional.
+Use `GET /api/v1/usuarios` para validar disponibilidade funcional.
 
 ## Usuarios
 
-### GET /usuarios
+### GET /api/v1/usuarios
 
 Lista usuarios cadastrados.
 
@@ -31,7 +31,7 @@ Resposta `200`:
 ]
 ```
 
-### GET /usuarios/:id
+### GET /api/v1/usuarios/:id
 
 Busca usuario por id inteiro positivo.
 
@@ -39,7 +39,7 @@ Resposta `200` em sucesso.
 Resposta `400` para id invalido.
 Resposta `404` quando nao encontrado.
 
-### POST /usuarios
+### POST /api/v1/usuarios
 
 Cria usuario.
 
@@ -66,7 +66,7 @@ Resposta `201` em sucesso.
 Resposta `400` em validacao.
 Resposta `409` para email duplicado.
 
-### PUT /usuarios/:id
+### PUT /api/v1/usuarios/:id
 
 Atualizacao completa.
 
@@ -79,7 +79,7 @@ Demais campos opcionais: `papel`, `ativo`.
 
 Resposta `200`, `400`, `404`, `409`.
 
-### PATCH /usuarios/:id
+### PATCH /api/v1/usuarios/:id
 
 Atualizacao parcial.
 
@@ -92,7 +92,7 @@ Body deve ter pelo menos um campo entre:
 
 Resposta `200`, `400`, `404`, `409`.
 
-### DELETE /usuarios/:id
+### DELETE /api/v1/usuarios/:id
 
 Remove usuario.
 
@@ -102,9 +102,9 @@ Resposta `404` quando nao encontrado.
 
 ## Customers
 
-### GET /customers
+### GET /api/v1/customers
 
-Retorna payload completo de wallets de referencia.
+Retorna payload completo de wallets carregado em memoria.
 
 Resposta `200`:
 
@@ -116,11 +116,68 @@ Resposta `200`:
 }
 ```
 
-### GET /customers/:id
+### GET /api/v1/customers/:id
 
-Busca customer por id textual no JSON de referencia.
+Busca customer por id textual.
 
 Resposta `200` em sucesso.
+Resposta `400` para id invalido.
+Resposta `404` quando nao encontrado.
+
+### POST /api/v1/customers
+
+Cria customer.
+
+Body minimo:
+
+```json
+{
+  "name": "Cliente A",
+  "email": "cliente.a@empresa.com"
+}
+```
+
+Campos opcionais:
+
+- `id`
+- `parentId`
+- `birthDate`
+- `cellphone`
+- `phone`
+- `occupation`
+- `state` (2 letras)
+
+Resposta `201` em sucesso.
+Resposta `400` em validacao.
+Resposta `409` para `id` duplicado.
+
+### PUT /api/v1/customers/:id
+
+Atualizacao completa.
+
+Body exige:
+
+- `name`
+- `email`
+
+Demais campos opcionais.
+
+Resposta `200`, `400`, `404`.
+
+### PATCH /api/v1/customers/:id
+
+Atualizacao parcial.
+
+Body deve ter pelo menos um campo valido de customer.
+
+Resposta `200`, `400`, `404`.
+
+### DELETE /api/v1/customers/:id
+
+Remove customer.
+
+Resposta `204` em sucesso.
+Resposta `400` para id invalido.
 Resposta `404` quando nao encontrado.
 
 ## Formato de erro
@@ -153,7 +210,7 @@ Exemplo de validacao (`400`):
 Criar usuario:
 
 ```bash
-curl -X POST http://localhost:3000/usuarios \
+curl -X POST http://localhost:3000/api/v1/usuarios \
   -H "Content-Type: application/json" \
   -d "{\"nome\":\"Ana\",\"email\":\"ana@empresa.com\"}"
 ```
@@ -161,5 +218,5 @@ curl -X POST http://localhost:3000/usuarios \
 Listar customers:
 
 ```bash
-curl http://localhost:3000/customers
+curl http://localhost:3000/api/v1/customers
 ```

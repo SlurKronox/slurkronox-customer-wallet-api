@@ -16,11 +16,11 @@ test('deve executar fluxo basico de usuarios', async () => {
   try {
     const baseUrl = obterBaseUrl(servidor);
 
-    const listaInicial = await fetch(`${baseUrl}/usuarios`);
+    const listaInicial = await fetch(`${baseUrl}/api/v1/usuarios`);
     assert.equal(listaInicial.status, 200);
     assert.ok(Array.isArray(await listaInicial.json()));
 
-    const criacao = await fetch(`${baseUrl}/usuarios`, {
+    const criacao = await fetch(`${baseUrl}/api/v1/usuarios`, {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify({ nome: 'Ana', email: 'ana@empresa.com' }),
@@ -29,10 +29,10 @@ test('deve executar fluxo basico de usuarios', async () => {
     const usuario = await criacao.json();
     assert.equal(usuario.nome, 'Ana');
 
-    const busca = await fetch(`${baseUrl}/usuarios/${usuario.id}`);
+    const busca = await fetch(`${baseUrl}/api/v1/usuarios/${usuario.id}`);
     assert.equal(busca.status, 200);
 
-    const exclusao = await fetch(`${baseUrl}/usuarios/${usuario.id}`, {
+    const exclusao = await fetch(`${baseUrl}/api/v1/usuarios/${usuario.id}`, {
       method: 'DELETE',
     });
     assert.equal(exclusao.status, 204);
