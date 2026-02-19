@@ -1,0 +1,517 @@
+openapi: 3.0.3
+info:
+  title: Kronox Customer Wallet Core API
+  version: 1.0.0
+  description: API para gerenciamento de usuarios e customers.
+
+servers:
+  - url: http://localhost:3000/api/v1
+    description: Ambiente local
+
+tags:
+  - name: Health
+  - name: Usuarios
+  - name: Customers
+
+paths:
+  /health:
+    get:
+      tags: [Health]
+      summary: Status da API
+      responses:
+        '200':
+          description: API disponivel
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+
+  /usuarios:
+    get:
+      tags: [Usuarios]
+      summary: Lista usuarios
+      responses:
+        '200':
+          description: Lista retornada com sucesso
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Usuario'
+    post:
+      tags: [Usuarios]
+      summary: Cria usuario
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UsuarioCriacao'
+      responses:
+        '201':
+          description: Usuario criado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Usuario'
+        '400':
+          $ref: '#/components/responses/ErroValidacao'
+        '409':
+          $ref: '#/components/responses/ErroConflito'
+
+  /usuarios/{id}:
+    parameters:
+      - $ref: '#/components/parameters/IdUsuario'
+    get:
+      tags: [Usuarios]
+      summary: Busca usuario por id
+      responses:
+        '200':
+          description: Usuario encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Usuario'
+        '400':
+          $ref: '#/components/responses/ErroPadrao'
+        '404':
+          $ref: '#/components/responses/ErroNaoEncontrado'
+    put:
+      tags: [Usuarios]
+      summary: Atualiza usuario (completo)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UsuarioAtualizacao'
+      responses:
+        '200':
+          description: Usuario atualizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Usuario'
+        '400':
+          $ref: '#/components/responses/ErroValidacao'
+        '404':
+          $ref: '#/components/responses/ErroNaoEncontrado'
+        '409':
+          $ref: '#/components/responses/ErroConflito'
+    patch:
+      tags: [Usuarios]
+      summary: Atualiza usuario (parcial)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UsuarioAtualizacaoParcial'
+      responses:
+        '200':
+          description: Usuario atualizado parcialmente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Usuario'
+        '400':
+          $ref: '#/components/responses/ErroValidacao'
+        '404':
+          $ref: '#/components/responses/ErroNaoEncontrado'
+        '409':
+          $ref: '#/components/responses/ErroConflito'
+    delete:
+      tags: [Usuarios]
+      summary: Remove usuario
+      responses:
+        '204':
+          description: Usuario removido
+        '400':
+          $ref: '#/components/responses/ErroPadrao'
+        '404':
+          $ref: '#/components/responses/ErroNaoEncontrado'
+
+  /customers:
+    get:
+      tags: [Customers]
+      summary: Lista customers
+      responses:
+        '200':
+          description: Lista retornada com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomersPayload'
+    post:
+      tags: [Customers]
+      summary: Cria customer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomerCriacao'
+      responses:
+        '201':
+          description: Customer criado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Customer'
+        '400':
+          $ref: '#/components/responses/ErroValidacao'
+        '409':
+          $ref: '#/components/responses/ErroConflito'
+
+  /customers/{id}:
+    parameters:
+      - $ref: '#/components/parameters/IdCustomer'
+    get:
+      tags: [Customers]
+      summary: Busca customer por id
+      responses:
+        '200':
+          description: Customer encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Customer'
+        '400':
+          $ref: '#/components/responses/ErroPadrao'
+        '404':
+          $ref: '#/components/responses/ErroNaoEncontrado'
+    put:
+      tags: [Customers]
+      summary: Atualiza customer (completo)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomerAtualizacao'
+      responses:
+        '200':
+          description: Customer atualizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Customer'
+        '400':
+          $ref: '#/components/responses/ErroValidacao'
+        '404':
+          $ref: '#/components/responses/ErroNaoEncontrado'
+    patch:
+      tags: [Customers]
+      summary: Atualiza customer (parcial)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomerAtualizacaoParcial'
+      responses:
+        '200':
+          description: Customer atualizado parcialmente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Customer'
+        '400':
+          $ref: '#/components/responses/ErroValidacao'
+        '404':
+          $ref: '#/components/responses/ErroNaoEncontrado'
+    delete:
+      tags: [Customers]
+      summary: Remove customer
+      responses:
+        '204':
+          description: Customer removido
+        '400':
+          $ref: '#/components/responses/ErroPadrao'
+        '404':
+          $ref: '#/components/responses/ErroNaoEncontrado'
+
+components:
+  parameters:
+    IdUsuario:
+      in: path
+      name: id
+      required: true
+      schema:
+        type: integer
+      description: Id numerico de usuario
+    IdCustomer:
+      in: path
+      name: id
+      required: true
+      schema:
+        type: string
+      description: Id textual de customer
+
+  responses:
+    ErroPadrao:
+      description: Erro de requisicao
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Erro'
+    ErroNaoEncontrado:
+      description: Recurso nao encontrado
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Erro'
+    ErroConflito:
+      description: Conflito de dados
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Erro'
+    ErroValidacao:
+      description: Erro de validacao
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErroComDetalhes'
+
+  schemas:
+    HealthResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: ok
+        servico:
+          type: string
+          example: kronox-customer-wallet-core
+        versao:
+          type: string
+          example: 1.0.0
+        ambiente:
+          type: string
+          example: development
+        timestamp:
+          type: string
+          format: date-time
+      required: [status, servico, versao, ambiente, timestamp]
+
+    Usuario:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        nome:
+          type: string
+          example: Ana
+        email:
+          type: string
+          format: email
+          example: ana@empresa.com
+        papel:
+          type: string
+          example: usuario
+        ativo:
+          type: boolean
+          example: true
+        criadoEm:
+          type: string
+          format: date-time
+        atualizadoEm:
+          type: string
+          format: date-time
+      required: [id, nome, email, papel, ativo, criadoEm, atualizadoEm]
+
+    UsuarioCriacao:
+      type: object
+      properties:
+        nome:
+          type: string
+        email:
+          type: string
+          format: email
+        papel:
+          type: string
+          default: usuario
+        ativo:
+          type: boolean
+          default: true
+      required: [nome, email]
+
+    UsuarioAtualizacao:
+      type: object
+      properties:
+        nome:
+          type: string
+        email:
+          type: string
+          format: email
+        papel:
+          type: string
+        ativo:
+          type: boolean
+      required: [nome, email]
+
+    UsuarioAtualizacaoParcial:
+      type: object
+      properties:
+        nome:
+          type: string
+        email:
+          type: string
+          format: email
+        papel:
+          type: string
+        ativo:
+          type: boolean
+      minProperties: 1
+
+    Customer:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 5da9ea674234635bdff45c02
+        name:
+          type: string
+          example: Cliente 149501
+        parentId:
+          type: string
+          example: 5da9ea6732123433432
+        birthDate:
+          type: string
+          format: date-time
+        cellphone:
+          type: string
+          example: (32)(11111111)
+        phone:
+          type: string
+          example: (32)11111111
+        email:
+          type: string
+          format: email
+          example: email@email.com.br
+        occupation:
+          type: string
+          example: Medico
+        state:
+          type: string
+          example: SP
+        createdAt:
+          type: string
+          format: date-time
+      required: [id, name, email, createdAt]
+
+    CustomerCriacao:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        parentId:
+          type: string
+        birthDate:
+          type: string
+          format: date-time
+        cellphone:
+          type: string
+        phone:
+          type: string
+        email:
+          type: string
+          format: email
+        occupation:
+          type: string
+        state:
+          type: string
+          minLength: 2
+          maxLength: 2
+      required: [name, email]
+
+    CustomerAtualizacao:
+      type: object
+      properties:
+        name:
+          type: string
+        parentId:
+          type: string
+        birthDate:
+          type: string
+          format: date-time
+        cellphone:
+          type: string
+        phone:
+          type: string
+        email:
+          type: string
+          format: email
+        occupation:
+          type: string
+        state:
+          type: string
+          minLength: 2
+          maxLength: 2
+      required: [name, email]
+
+    CustomerAtualizacaoParcial:
+      type: object
+      properties:
+        name:
+          type: string
+        parentId:
+          type: string
+        birthDate:
+          type: string
+          format: date-time
+        cellphone:
+          type: string
+        phone:
+          type: string
+        email:
+          type: string
+          format: email
+        occupation:
+          type: string
+        state:
+          type: string
+          minLength: 2
+          maxLength: 2
+      minProperties: 1
+
+    CustomersPayload:
+      type: object
+      properties:
+        customerWallets:
+          type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/Customer'
+          required: [data]
+      required: [customerWallets]
+
+    Erro:
+      type: object
+      properties:
+        mensagem:
+          type: string
+          example: Nao encontrado
+      required: [mensagem]
+
+    ErroComDetalhes:
+      allOf:
+        - $ref: '#/components/schemas/Erro'
+        - type: object
+          properties:
+            detalhes:
+              type: array
+              items:
+                type: object
+                properties:
+                  campo:
+                    type: string
+                  mensagem:
+                    type: string

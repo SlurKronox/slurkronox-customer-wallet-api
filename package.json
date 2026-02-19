@@ -1,15 +1,23 @@
 {
   "name": "kronox-customer-wallet-core",
   "version": "1.0.0",
-  "description": "",
+  "description": "API REST para gerenciamento de usuarios e customers em Node.js com Express.",
   "main": "src/servidor.js",
   "scripts": {
     "dev": "nodemon src/servidor.js",
     "start": "node src/servidor.js",
-    "test": "node --test"
+    "test": "node --test",
+    "test:postman": "npx --yes newman run postman/Kronox-Customer-Wallet-Core.postman_collection.json -e postman/Kronox-Customer-Wallet-Core.postman_environment.json"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "api",
+    "express",
+    "nodejs",
+    "rest",
+    "customers",
+    "usuarios"
+  ],
+  "author": "Savio B. Filho",
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {

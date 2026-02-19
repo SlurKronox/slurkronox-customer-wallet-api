@@ -99,3 +99,30 @@ test('deve retornar 404 quando customer nao existir', async () => {
     await once(servidor, 'close');
   }
 });
+
+test('deve retornar 409 ao criar customer com id duplicado', async () => {
+  const servidor = aplicacao.listen(0);
+  await once(servidor, 'listening');
+
+  try {
+    const baseUrl = obterBaseUrl(servidor);
+    const payloadIdDuplicado = {
+      id: '5da9ea674234635bdff45c02',
+      name: 'Duplicado',
+      email: 'duplicado@empresa.com',
+    };
+
+    const resposta = await fetch(`${baseUrl}/api/v1/customers`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify(payloadIdDuplicado),
+    });
+
+    assert.equal(resposta.status, 409);
+    const corpo = await resposta.json();
+    assert.equal(corpo.mensagem, 'Id de customer ja existe');
+  } finally {
+    servidor.close();
+    await once(servidor, 'close');
+  }
+});

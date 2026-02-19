@@ -1,13 +1,42 @@
-# Referencia de API
+# Referencia da API
 
 Base URL local:
 
 - `http://localhost:3000/api/v1`
 
-## Health basica
+Formato de resposta de erro:
 
-Sem endpoint dedicado de healthcheck no momento.
-Use `GET /api/v1/usuarios` para validar disponibilidade funcional.
+```json
+{
+  "mensagem": "Descricao do erro",
+  "detalhes": [
+    {
+      "campo": "email",
+      "mensagem": "Email invalido"
+    }
+  ]
+}
+```
+
+`detalhes` e opcional e aparece em erros de validacao.
+
+## Health
+
+### GET /api/v1/health
+
+Retorna status basico da API.
+
+Resposta `200`:
+
+```json
+{
+  "status": "ok",
+  "servico": "kronox-customer-wallet-core",
+  "versao": "1.0.0",
+  "ambiente": "development",
+  "timestamp": "2026-02-19T18:20:00.000Z"
+}
+```
 
 ## Usuarios
 
@@ -15,29 +44,17 @@ Use `GET /api/v1/usuarios` para validar disponibilidade funcional.
 
 Lista usuarios cadastrados.
 
-Resposta `200`:
-
-```json
-[
-  {
-    "id": 1,
-    "nome": "Ana",
-    "email": "ana@empresa.com",
-    "papel": "usuario",
-    "ativo": true,
-    "criadoEm": "2026-02-12T10:00:00.000Z",
-    "atualizadoEm": "2026-02-12T10:00:00.000Z"
-  }
-]
-```
+Resposta `200`: array de usuarios.
 
 ### GET /api/v1/usuarios/:id
 
-Busca usuario por id inteiro positivo.
+Busca usuario por id numerico inteiro positivo.
 
-Resposta `200` em sucesso.
-Resposta `400` para id invalido.
-Resposta `404` quando nao encontrado.
+Respostas:
+
+- `200`: usuario encontrado
+- `400`: id invalido
+- `404`: usuario nao encontrado
 
 ### POST /api/v1/usuarios
 
@@ -62,51 +79,61 @@ Regras:
 - `ativo` opcional (padrao `true`)
 - `email` unico
 
-Resposta `201` em sucesso.
-Resposta `400` em validacao.
-Resposta `409` para email duplicado.
+Respostas:
+
+- `201`: criado
+- `400`: erro de validacao
+- `409`: email ja existe
 
 ### PUT /api/v1/usuarios/:id
 
-Atualizacao completa.
+Atualizacao completa de usuario.
 
-Body exige:
+Campos obrigatorios no body:
 
 - `nome`
 - `email`
 
-Demais campos opcionais: `papel`, `ativo`.
+Respostas:
 
-Resposta `200`, `400`, `404`, `409`.
+- `200`: atualizado
+- `400`: erro de validacao/id
+- `404`: usuario nao encontrado
+- `409`: email ja existe
 
 ### PATCH /api/v1/usuarios/:id
 
-Atualizacao parcial.
+Atualizacao parcial de usuario.
 
-Body deve ter pelo menos um campo entre:
+Informe ao menos um campo:
 
 - `nome`
 - `email`
 - `papel`
 - `ativo`
 
-Resposta `200`, `400`, `404`, `409`.
+Respostas:
+
+- `200`: atualizado
+- `400`: erro de validacao/id
+- `404`: usuario nao encontrado
+- `409`: email ja existe
 
 ### DELETE /api/v1/usuarios/:id
 
 Remove usuario.
 
-Resposta `204` em sucesso.
-Resposta `400` para id invalido.
-Resposta `404` quando nao encontrado.
+Respostas:
+
+- `204`: removido
+- `400`: id invalido
+- `404`: usuario nao encontrado
 
 ## Customers
 
 ### GET /api/v1/customers
 
-Retorna payload completo de wallets carregado em memoria.
-
-Resposta `200`:
+Lista customers no formato:
 
 ```json
 {
@@ -116,13 +143,17 @@ Resposta `200`:
 }
 ```
 
+Resposta `200`.
+
 ### GET /api/v1/customers/:id
 
 Busca customer por id textual.
 
-Resposta `200` em sucesso.
-Resposta `400` para id invalido.
-Resposta `404` quando nao encontrado.
+Respostas:
+
+- `200`: customer encontrado
+- `400`: id invalido
+- `404`: customer nao encontrado
 
 ### POST /api/v1/customers
 
@@ -147,63 +178,48 @@ Campos opcionais:
 - `occupation`
 - `state` (2 letras)
 
-Resposta `201` em sucesso.
-Resposta `400` em validacao.
-Resposta `409` para `id` duplicado.
+Respostas:
+
+- `201`: criado
+- `400`: erro de validacao
+- `409`: id de customer ja existe
 
 ### PUT /api/v1/customers/:id
 
-Atualizacao completa.
+Atualizacao completa de customer.
 
-Body exige:
+Campos obrigatorios no body:
 
 - `name`
 - `email`
 
-Demais campos opcionais.
+Respostas:
 
-Resposta `200`, `400`, `404`.
+- `200`: atualizado
+- `400`: erro de validacao/id
+- `404`: customer nao encontrado
 
 ### PATCH /api/v1/customers/:id
 
-Atualizacao parcial.
+Atualizacao parcial de customer.
 
-Body deve ter pelo menos um campo valido de customer.
+Informe ao menos um campo valido.
 
-Resposta `200`, `400`, `404`.
+Respostas:
+
+- `200`: atualizado
+- `400`: erro de validacao/id
+- `404`: customer nao encontrado
 
 ### DELETE /api/v1/customers/:id
 
 Remove customer.
 
-Resposta `204` em sucesso.
-Resposta `400` para id invalido.
-Resposta `404` quando nao encontrado.
+Respostas:
 
-## Formato de erro
-
-Resposta de erro padrao:
-
-```json
-{
-  "mensagem": "Mensagem do erro",
-  "detalhes": []
-}
-```
-
-Exemplo de validacao (`400`):
-
-```json
-{
-  "mensagem": "Erro de validacao",
-  "detalhes": [
-    {
-      "campo": "email",
-      "mensagem": "Email invalido"
-    }
-  ]
-}
-```
+- `204`: removido
+- `400`: id invalido
+- `404`: customer nao encontrado
 
 ## Exemplos cURL
 
@@ -213,6 +229,12 @@ Criar usuario:
 curl -X POST http://localhost:3000/api/v1/usuarios \
   -H "Content-Type: application/json" \
   -d "{\"nome\":\"Ana\",\"email\":\"ana@empresa.com\"}"
+```
+
+Healthcheck:
+
+```bash
+curl http://localhost:3000/api/v1/health
 ```
 
 Listar customers:

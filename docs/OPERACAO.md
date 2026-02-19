@@ -2,18 +2,23 @@
 
 ## Requisitos
 
-- Node.js 18+ (recomendado 20+)
-- npm
+- Node.js 20+ (recomendado usar `.nvmrc`)
+- npm 10+
 
-## Scripts disponiveis
+## Scripts
 
-- `npm run dev`: sobe com `nodemon`
-- `npm start`: sobe servidor normal
-- `npm test`: executa testes
+- `npm run dev`: sobe com `nodemon`.
+- `npm start`: sobe servidor normal.
+- `npm test`: executa suite automatizada.
+- `npm run test:postman`: executa collection Postman (requer API em execucao).
 
 ## Configuracao de porta
 
-Configurada em `src/config/default.json`:
+Arquivo:
+
+- `src/config/default.json`
+
+Exemplo:
 
 ```json
 {
@@ -23,76 +28,72 @@ Configurada em `src/config/default.json`:
 }
 ```
 
-Tambem e possivel usar variavel de ambiente:
-
-```bash
-PORT=4000 npm start
-```
-
-No PowerShell:
+Override por variavel de ambiente:
 
 ```powershell
 $env:PORT = "4000"
 npm start
 ```
 
-## Logs
+## Healthcheck
 
-Log atual no startup:
+Use:
 
-- `Servidor rodando na porta X`
+- `GET /api/v1/health`
 
-Nao existe logging estruturado ainda.
+Objetivo:
+
+- validar disponibilidade da API e metadados de runtime.
 
 ## Persistencia
 
-- Usuarios: memoria local (nao persistente)
-- Customers: memoria local (carregada inicialmente de `src/api/data/referencias/customer-wallets.json`)
+- Usuarios: memoria local (nao persistente).
+- Customers: memoria local carregada de `customer-wallets.json`.
 
-## Problemas comuns
+Ao reiniciar o servidor, os dados voltam ao estado inicial.
 
-### Porta em uso
+## Logs
 
-Sintoma: erro `EADDRINUSE`.
+Atualmente:
 
-Acao:
+- log de startup (`Servidor rodando na porta X`).
+- erros de inicializacao de porta.
 
-1. Se `PORT` estiver definida, altere para outra porta livre.
-2. Se `PORT` nao estiver definida, a aplicacao tenta automaticamente a proxima porta livre (de `3000` ate `3020`).
-3. Se todas estiverem ocupadas, encerra com erro.
+Nao ha logging estruturado nesta versao.
 
-### Rota retorna 404
+## Troubleshooting
 
-Verificar:
+### Porta em uso (`EADDRINUSE`)
 
-1. Se servidor subiu corretamente.
-2. Se URL esta correta (`/api/v1/usuarios` ou `/api/v1/customers`).
-3. Se metodo HTTP esta correto.
+1. Se `PORT` estiver fixa, troque para outra porta livre.
+2. Sem `PORT` fixa, o servidor tenta automaticamente a proxima porta.
+3. Se o range `3000-3020` estiver ocupado, o processo encerra.
 
-### Falha em testes
+### Erro 404 em rota valida
 
-Executar:
+Checklist:
 
-```bash
-npm test
-```
+1. Confirme se o prefixo `/api/v1` foi usado.
+2. Confirme metodo HTTP correto.
+3. Confirme que o servidor iniciou sem erro.
 
-Se falhar, revisar:
+### Erro 400 de validacao
 
-1. Mudancas recentes em rotas/controllers/services.
-2. Payload esperado nos testes.
+Checklist:
 
-### Testar no Postman
+1. Verifique campos obrigatorios.
+2. Verifique tipos (`boolean`, `string`, `email`, etc.).
+3. Consulte `docs/API.md` ou `docs/openapi.yaml`.
 
-1. Importe `postman/Kronox-Customer-Wallet-Core.postman_collection.json`.
-2. Importe `postman/Kronox-Customer-Wallet-Core.postman_environment.json`.
-3. Escolha o environment local.
-4. Ajuste `baseUrl` para a porta exibida no log de startup.
-Valor sugerido: `http://localhost:PORTA/api/v1`.
+## Operacao com Postman
 
-## Roadmap tecnico sugerido
+1. Importe a collection e o environment da pasta `postman/`.
+2. Ajuste `baseUrl` para a porta atual.
+3. Execute a collection completa para smoke test.
 
-1. Persistencia real (PostgreSQL/MongoDB).
-2. Camada de autenticacao e autorizacao.
-3. Logging estruturado e observabilidade.
-4. Versionamento de API (`/v1`).
+## Evolucao recomendada
+
+1. Adicionar persistencia real (PostgreSQL/MongoDB).
+2. Adicionar autenticacao e autorizacao.
+3. Adicionar logging estruturado e observabilidade.
+4. Adicionar testes de integracao com cenarios de erro mais amplos.

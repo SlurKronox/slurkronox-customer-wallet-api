@@ -1,51 +1,58 @@
-# Arquitetura da API
+# Arquitetura
 
-## Visao geral
+## Estilo adotado
 
-A API segue separacao por responsabilidade:
+A API segue arquitetura em camadas com responsabilidades bem separadas:
 
-- `routes`: define endpoints HTTP e delega ao controller
-- `controllers`: converte entrada HTTP para chamadas de servico
-- `services`: aplica regras de negocio
-- `data`: acesso aos dados (em memoria ou referencia JSON)
-- `validators`: regras de validacao de payload
-- `compartilhado`: erros e middlewares globais
+- `routes`: mapeamento de endpoints HTTP.
+- `controllers`: adaptacao de HTTP para chamadas de dominio.
+- `services`: regras de negocio e orquestracao.
+- `validators`: validacao e normalizacao de payload.
+- `data`: persistencia em memoria e acesso a dados de referencia.
+- `compartilhado`: erros customizados e middlewares globais.
 
 ## Fluxo de requisicao
 
-1. Requisicao chega em `src/servidor.js`
-2. `src/aplicacao.js` registra rotas via `src/api/rotas-api.js`
-3. Rota chama controller correspondente
-4. Controller chama servico
-5. Servico chama repositorio/data e valida regras de negocio
-6. Resposta retorna ao cliente
-7. Em erro, `tratador-erro` monta resposta padrao
+1. Requisicao entra por `src/servidor.js`.
+2. `src/aplicacao.js` aplica middlewares e registra `/api/v1`.
+3. `src/api/rotas-api.js` encaminha para modulo de rota.
+4. Controller valida parametros de rota e chama service.
+5. Service aplica regras de negocio e validadores.
+6. Repositorio (`data`) retorna ou persiste dados em memoria.
+7. Em excecao, middlewares globais padronizam resposta de erro.
 
-## Modulos existentes
+## Modulos funcionais
+
+### Health
+
+- Rota: `src/api/routes/health.js`
+- Controller: `src/api/controllers/health-controlador.js`
+- Responsabilidade: verificar disponibilidade da API e metadados de execucao.
 
 ### Usuarios
 
-- Entrada HTTP: `src/api/routes/usuarios-rotas.js`
+- Rota: `src/api/routes/usuarios-rotas.js`
 - Controller: `src/api/controllers/usuarios-controlador.js`
 - Service: `src/api/services/usuarios-servico.js`
-- Data: `src/api/data/usuarios-repositorio.js`
 - Validator: `src/api/validators/usuarios-validador.js`
+- Repositorio: `src/api/data/usuarios-repositorio.js`
 
 ### Customers
 
-- Entrada HTTP: `src/api/routes/customers.js`
+- Rota: `src/api/routes/customers.js`
 - Controller: `src/api/controllers/customers.js`
 - Service: `src/api/services/customers-servico.js`
-- Data: `src/api/data/customers-repositorio.js`
-- Referencia: `src/api/data/referencias/customer-wallets.json`
+- Validator: `src/api/validators/customers-validador.js`
+- Repositorio: `src/api/data/customers-repositorio.js`
+- Base inicial: `src/api/data/referencias/customer-wallets.json`
 
 ## Tratamento de erros
 
-- Classe base: `src/compartilhado/erros/erro-http.js`
+- Classe de erro HTTP: `src/compartilhado/erros/erro-http.js`
 - Middleware 404: `src/compartilhado/intermediarios/nao-encontrado.js`
 - Middleware global: `src/compartilhado/intermediarios/tratador-erro.js`
 
-Padrao de payload de erro:
+Formato de erro:
 
 ```json
 {
@@ -54,16 +61,25 @@ Padrao de payload de erro:
 }
 ```
 
-`detalhes` aparece quando existe validacao ou erro com detalhes anexados.
-
 ## Configuracao e bootstrap
 
-- Porta resolvida em `src/config/servidor.config.js`
-- App Express criada em `src/config/express.js`
-- Entrada de configuracao em `src/config/default.json`
+- Config de porta: `src/config/servidor.config.js`
+- Instancia Express: `src/config/express.js`
+- Config default: `src/config/default.json`
 
-## Decisoes arquiteturais
+Resolucao de porta:
 
-- Dados de usuarios em memoria para simplicidade da fase atual.
-- Customers em leitura de arquivo para referencia estatica.
-- Camadas separadas para facilitar migracao futura para banco real.
+1. `process.env.PORT`
+2. `server.port` no config
+3. fallback `3000`
+
+Fallback de conflito de porta:
+
+- Sem `PORT` fixa, tenta automaticamente ate `3020`.
+- Com `PORT` fixa, encerra com erro.
+
+## Limites atuais
+
+- Sem banco de dados (estado em memoria).
+- Sem autenticacao/autorizacao.
+- Sem observabilidade estruturada (metrics/tracing).
