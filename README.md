@@ -153,6 +153,7 @@ Arquivos:
 
 - `postman/Kronox-Customer-Wallet-Core.postman_collection.json`
 - `postman/Kronox-Customer-Wallet-Core.postman_environment.json`
+- Tutorial detalhado: `docs/POSTMAN-TUTORIAL.md`
 
 Passos:
 
@@ -165,6 +166,7 @@ Passos:
 
 - `docs/README.md`
 - `docs/API.md`
+- `docs/POSTMAN-TUTORIAL.md`
 - `docs/openapi.yaml`
 - `docs/ARQUITETURA.md`
 - `docs/OPERACAO.md`
