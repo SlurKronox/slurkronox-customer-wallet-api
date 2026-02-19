@@ -10,6 +10,7 @@ const CAMPOS_ATUALIZAVEIS = [
   'occupation',
   'state',
 ];
+const CAMPOS_CRIACAO = ['id', ...CAMPOS_ATUALIZAVEIS];
 
 function ehObjetoSimples(valor) {
   return valor !== null && typeof valor === 'object' && !Array.isArray(valor);
@@ -35,6 +36,14 @@ function normalizarEstado(valor) {
 
 function temPropriedade(obj, prop) {
   return Object.prototype.hasOwnProperty.call(obj, prop);
+}
+
+function validarCamposDesconhecidos(payload, erros, permitidos) {
+  Object.keys(payload).forEach((campo) => {
+    if (!permitidos.includes(campo)) {
+      erros.push({ campo, mensagem: 'Campo nao permitido' });
+    }
+  });
 }
 
 function validarCampoEmail(payload, erros, dados, obrigatorio) {
@@ -159,6 +168,8 @@ function validarCriacaoCustomer(payload) {
     };
   }
 
+  validarCamposDesconhecidos(payload, erros, CAMPOS_CRIACAO);
+
   validarCampoId(payload, erros, dados);
   validarCampoName(payload, erros, dados, true);
   validarCampoEmail(payload, erros, dados, true);
@@ -183,6 +194,8 @@ function validarAtualizacaoCustomer(payload) {
     };
   }
 
+  validarCamposDesconhecidos(payload, erros, CAMPOS_ATUALIZAVEIS);
+
   validarCampoName(payload, erros, dados, true);
   validarCampoEmail(payload, erros, dados, true);
   validarCamposOpcionais(payload, erros, dados);
@@ -205,6 +218,8 @@ function validarAtualizacaoParcialCustomer(payload) {
       dados,
     };
   }
+
+  validarCamposDesconhecidos(payload, erros, CAMPOS_ATUALIZAVEIS);
 
   const temAlgumCampo = CAMPOS_ATUALIZAVEIS.some((campo) => temPropriedade(payload, campo));
   if (!temAlgumCampo) {

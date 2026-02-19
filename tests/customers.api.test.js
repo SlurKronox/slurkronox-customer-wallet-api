@@ -19,9 +19,9 @@ test('deve executar fluxo completo de customers', async () => {
     const listaInicial = await fetch(`${baseUrl}/api/v1/customers`);
     assert.equal(listaInicial.status, 200);
     const payloadInicial = await listaInicial.json();
-    assert.ok(payloadInicial.customerWallets);
-    assert.ok(Array.isArray(payloadInicial.customerWallets.data));
-    assert.ok(payloadInicial.customerWallets.data.length > 0);
+    assert.ok(Array.isArray(payloadInicial.dados));
+    assert.ok(payloadInicial.dados.length > 0);
+    assert.equal(typeof payloadInicial.meta.total, 'number');
 
     const criacao = await fetch(`${baseUrl}/api/v1/customers`, {
       method: 'POST',
@@ -34,14 +34,16 @@ test('deve executar fluxo completo de customers', async () => {
       }),
     });
     assert.equal(criacao.status, 201);
-    const customerCriado = await criacao.json();
+    const customerCriadoPayload = await criacao.json();
+    const customerCriado = customerCriadoPayload.dados;
     assert.ok(customerCriado.id);
     assert.equal(customerCriado.name, 'Cliente Teste API');
     assert.equal(customerCriado.state, 'SP');
 
     const busca = await fetch(`${baseUrl}/api/v1/customers/${customerCriado.id}`);
     assert.equal(busca.status, 200);
-    const customerBuscado = await busca.json();
+    const customerBuscadoPayload = await busca.json();
+    const customerBuscado = customerBuscadoPayload.dados;
     assert.equal(customerBuscado.id, customerCriado.id);
 
     const atualizacao = await fetch(`${baseUrl}/api/v1/customers/${customerCriado.id}`, {
@@ -55,7 +57,8 @@ test('deve executar fluxo completo de customers', async () => {
       }),
     });
     assert.equal(atualizacao.status, 200);
-    const customerAtualizado = await atualizacao.json();
+    const customerAtualizadoPayload = await atualizacao.json();
+    const customerAtualizado = customerAtualizadoPayload.dados;
     assert.equal(customerAtualizado.name, 'Cliente Teste Atualizado');
     assert.equal(customerAtualizado.state, 'RJ');
 
@@ -67,7 +70,8 @@ test('deve executar fluxo completo de customers', async () => {
       }),
     });
     assert.equal(parcial.status, 200);
-    const customerParcial = await parcial.json();
+    const customerParcialPayload = await parcial.json();
+    const customerParcial = customerParcialPayload.dados;
     assert.equal(customerParcial.occupation, 'Arquiteto');
 
     const exclusao = await fetch(`${baseUrl}/api/v1/customers/${customerCriado.id}`, {
@@ -83,7 +87,7 @@ test('deve executar fluxo completo de customers', async () => {
   }
 });
 
-test('deve retornar 404 quando customer nao existir', async () => {
+test('deve retornar erros de validacao de customers', async () => {
   const servidor = aplicacao.listen(0);
   await once(servidor, 'listening');
 
@@ -94,33 +98,68 @@ test('deve retornar 404 quando customer nao existir', async () => {
 
     const buscaIdInvalido = await fetch(`${baseUrl}/api/v1/customers/%20`);
     assert.equal(buscaIdInvalido.status, 400);
+
+    const campoDesconhecido = await fetch(`${baseUrl}/api/v1/customers`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        name: 'Campo Invalido',
+        email: 'campo.invalido@empresa.com',
+        campoNaoPermitido: 'x',
+      }),
+    });
+    assert.equal(campoDesconhecido.status, 400);
+    const corpoErro = await campoDesconhecido.json();
+    assert.ok(Array.isArray(corpoErro.detalhes));
+    assert.ok(corpoErro.detalhes.some((item) => item.campo === 'campoNaoPermitido'));
   } finally {
     servidor.close();
     await once(servidor, 'close');
   }
 });
 
-test('deve retornar 409 ao criar customer com id duplicado', async () => {
+test('deve retornar 409 para id e email duplicados em customers', async () => {
   const servidor = aplicacao.listen(0);
   await once(servidor, 'listening');
 
   try {
     const baseUrl = obterBaseUrl(servidor);
-    const payloadIdDuplicado = {
-      id: '5da9ea674234635bdff45c02',
-      name: 'Duplicado',
-      email: 'duplicado@empresa.com',
-    };
 
-    const resposta = await fetch(`${baseUrl}/api/v1/customers`, {
+    const respostaIdDuplicado = await fetch(`${baseUrl}/api/v1/customers`, {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
-      body: JSON.stringify(payloadIdDuplicado),
+      body: JSON.stringify({
+        id: '5da9ea674234635bdff45c02',
+        name: 'Duplicado',
+        email: 'duplicado@empresa.com',
+      }),
     });
 
-    assert.equal(resposta.status, 409);
-    const corpo = await resposta.json();
-    assert.equal(corpo.mensagem, 'Id de customer ja existe');
+    assert.equal(respostaIdDuplicado.status, 409);
+    const corpoId = await respostaIdDuplicado.json();
+    assert.equal(corpoId.mensagem, 'Id de customer ja existe');
+
+    const primeiro = await fetch(`${baseUrl}/api/v1/customers`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        name: 'Primeiro',
+        email: 'email.repetido@empresa.com',
+      }),
+    });
+    assert.equal(primeiro.status, 201);
+
+    const segundo = await fetch(`${baseUrl}/api/v1/customers`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        name: 'Segundo',
+        email: 'email.repetido@empresa.com',
+      }),
+    });
+    assert.equal(segundo.status, 409);
+    const corpoEmail = await segundo.json();
+    assert.equal(corpoEmail.mensagem, 'Email de customer ja esta em uso');
   } finally {
     servidor.close();
     await once(servidor, 'close');

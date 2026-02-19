@@ -1,4 +1,5 @@
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const CAMPOS_PERMITIDOS = ['nome', 'email', 'papel', 'ativo'];
 
 function ehObjetoSimples(valor) {
   return valor !== null && typeof valor === 'object' && !Array.isArray(valor);
@@ -16,6 +17,14 @@ function temPropriedade(obj, prop) {
   return Object.prototype.hasOwnProperty.call(obj, prop);
 }
 
+function validarCamposDesconhecidos(payload, erros, permitidos = CAMPOS_PERMITIDOS) {
+  Object.keys(payload).forEach((campo) => {
+    if (!permitidos.includes(campo)) {
+      erros.push({ campo, mensagem: 'Campo nao permitido' });
+    }
+  });
+}
+
 function validarCriacaoUsuario(payload) {
   const erros = [];
   const dados = {};
@@ -27,6 +36,8 @@ function validarCriacaoUsuario(payload) {
       dados,
     };
   }
+
+  validarCamposDesconhecidos(payload, erros);
 
   const nome = normalizarTexto(payload.nome);
   if (!nome) {
@@ -84,6 +95,8 @@ function validarAtualizacaoUsuario(payload) {
     };
   }
 
+  validarCamposDesconhecidos(payload, erros);
+
   const nome = normalizarTexto(payload.nome);
   if (!nome) {
     erros.push({ campo: 'nome', mensagem: 'Nome e obrigatorio' });
@@ -135,6 +148,8 @@ function validarAtualizacaoParcialUsuario(payload) {
       dados,
     };
   }
+
+  validarCamposDesconhecidos(payload, erros);
 
   const temAlgum = ['nome', 'email', 'papel', 'ativo'].some((campo) => temPropriedade(payload, campo));
   if (!temAlgum) {

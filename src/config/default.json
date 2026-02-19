@@ -1,5 +1,11 @@
 {
   "server": {
     "port": 3000
+  },
+  "security": {
+    "rateLimit": {
+      "windowMs": 900000,
+      "max": 500
+    }
   }
 }

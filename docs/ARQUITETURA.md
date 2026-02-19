@@ -1,33 +1,44 @@
-# Arquitetura
+# Arquitetura da API
 
-## Estilo adotado
+## Visao geral
 
-A API segue arquitetura em camadas com responsabilidades bem separadas:
+A API adota arquitetura em camadas para manter separacao de responsabilidades:
 
-- `routes`: mapeamento de endpoints HTTP.
-- `controllers`: adaptacao de HTTP para chamadas de dominio.
-- `services`: regras de negocio e orquestracao.
+- `routes`: definicao de rotas HTTP.
+- `controllers`: adaptacao da entrada HTTP e resposta.
+- `services`: regras de negocio.
 - `validators`: validacao e normalizacao de payload.
-- `data`: persistencia em memoria e acesso a dados de referencia.
-- `compartilhado`: erros customizados e middlewares globais.
+- `data`: persistencia em memoria.
+- `compartilhado`: infraestrutura transversal (erros, logger, middlewares, resposta).
 
 ## Fluxo de requisicao
 
-1. Requisicao entra por `src/servidor.js`.
-2. `src/aplicacao.js` aplica middlewares e registra `/api/v1`.
-3. `src/api/rotas-api.js` encaminha para modulo de rota.
-4. Controller valida parametros de rota e chama service.
-5. Service aplica regras de negocio e validadores.
-6. Repositorio (`data`) retorna ou persiste dados em memoria.
-7. Em excecao, middlewares globais padronizam resposta de erro.
+1. `src/servidor.js` inicializa o app e controla ciclo de vida.
+2. `src/config/express.js` aplica middlewares de seguranca e parse.
+3. `src/aplicacao.js` registra rotas em `/api/v1`.
+4. Rota chama controller.
+5. Controller chama service.
+6. Service valida, aplica regras e chama repositorio.
+7. Resposta retorna no contrato padrao (`dados`/`meta`).
 
-## Modulos funcionais
+## Contratos
+
+- Sucesso: `{ dados, meta? }`
+- Erro: `{ mensagem, requestId, detalhes? }`
+
+## Seguranca aplicada
+
+- `helmet` para headers de seguranca.
+- `express-rate-limit` para limitacao por IP.
+- `requestId` para rastreabilidade de requisicoes.
+- ocultacao de mensagens internas em erro `500`.
+
+## Modulos
 
 ### Health
 
 - Rota: `src/api/routes/health.js`
 - Controller: `src/api/controllers/health-controlador.js`
-- Responsabilidade: verificar disponibilidade da API e metadados de execucao.
 
 ### Usuarios
 
@@ -44,42 +55,15 @@ A API segue arquitetura em camadas com responsabilidades bem separadas:
 - Service: `src/api/services/customers-servico.js`
 - Validator: `src/api/validators/customers-validador.js`
 - Repositorio: `src/api/data/customers-repositorio.js`
-- Base inicial: `src/api/data/referencias/customer-wallets.json`
+- Carga inicial: `src/api/data/referencias/customer-wallets.json`
 
-## Tratamento de erros
+## Configuracao
 
-- Classe de erro HTTP: `src/compartilhado/erros/erro-http.js`
-- Middleware 404: `src/compartilhado/intermediarios/nao-encontrado.js`
-- Middleware global: `src/compartilhado/intermediarios/tratador-erro.js`
-
-Formato de erro:
-
-```json
-{
-  "mensagem": "Descricao do erro",
-  "detalhes": []
-}
-```
-
-## Configuracao e bootstrap
-
-- Config de porta: `src/config/servidor.config.js`
-- Instancia Express: `src/config/express.js`
-- Config default: `src/config/default.json`
-
-Resolucao de porta:
-
-1. `process.env.PORT`
-2. `server.port` no config
-3. fallback `3000`
-
-Fallback de conflito de porta:
-
-- Sem `PORT` fixa, tenta automaticamente ate `3020`.
-- Com `PORT` fixa, encerra com erro.
+- Porta: `src/config/default.json -> server.port`
+- Rate limit: `src/config/default.json -> security.rateLimit`
 
 ## Limites atuais
 
-- Sem banco de dados (estado em memoria).
+- Persistencia em memoria (nao persistente).
 - Sem autenticacao/autorizacao.
-- Sem observabilidade estruturada (metrics/tracing).
+- Sem banco de dados.

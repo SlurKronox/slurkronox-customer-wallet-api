@@ -2,28 +2,30 @@ const usuarios = [];
 let proximoId = 1;
 
 function listar() {
-  return [...usuarios];
+  return usuarios.map((usuario) => ({ ...usuario }));
 }
 
 function obterPorId(id) {
-  return usuarios.find((usuario) => usuario.id === id) || null;
+  const usuario = usuarios.find((item) => item.id === id);
+  return usuario ? { ...usuario } : null;
 }
 
 function obterPorEmail(email) {
   const normalizado = email.toLowerCase();
-  return usuarios.find((usuario) => usuario.email.toLowerCase() === normalizado) || null;
+  const usuario = usuarios.find((item) => item.email.toLowerCase() === normalizado);
+  return usuario ? { ...usuario } : null;
 }
 
 function criar(dados) {
   const agora = new Date().toISOString();
   const usuario = {
+    ...dados,
     id: proximoId++,
     criadoEm: agora,
     atualizadoEm: agora,
-    ...dados,
   };
   usuarios.push(usuario);
-  return usuario;
+  return { ...usuario };
 }
 
 function substituir(id, dados) {
@@ -32,16 +34,18 @@ function substituir(id, dados) {
     return null;
   }
 
+  const atual = usuarios[indice];
   const agora = new Date().toISOString();
   const usuario = {
-    ...usuarios[indice],
+    ...atual,
     ...dados,
     id,
+    criadoEm: atual.criadoEm,
     atualizadoEm: agora,
   };
 
   usuarios[indice] = usuario;
-  return usuario;
+  return { ...usuario };
 }
 
 function atualizarParcial(id, dados) {
@@ -55,11 +59,12 @@ function atualizarParcial(id, dados) {
     ...usuarios[indice],
     ...dados,
     id,
+    criadoEm: usuarios[indice].criadoEm,
     atualizadoEm: agora,
   };
 
   usuarios[indice] = usuario;
-  return usuario;
+  return { ...usuario };
 }
 
 function remover(id) {

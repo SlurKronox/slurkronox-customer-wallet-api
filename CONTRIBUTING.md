@@ -9,7 +9,7 @@ Obrigado por contribuir com a `Kronox Customer Wallet Core API`.
 
 ## Fluxo recomendado
 
-1. Faça um fork ou crie branch a partir da `main`.
+1. Faca fork ou crie branch a partir da `main`.
 2. Mantenha cada PR focado em um objetivo.
 3. Execute os testes antes de abrir PR.
 4. Atualize a documentacao quando alterar comportamento da API.
@@ -34,23 +34,26 @@ Preferencialmente use Conventional Commits:
 
 ## Checklist de Pull Request
 
-- [ ] Build e testes locais executados com sucesso.
-- [ ] Mudancas cobertas por testes ou justificadas.
-- [ ] Documentacao atualizada (`README.md` e/ou `docs/`).
-- [ ] Sem arquivos duplicados ou codigo morto.
-- [ ] Sem segredos no codigo.
+- [ ] Rodei `npm test`.
+- [ ] Atualizei documentacao relevante.
+- [ ] Inclui testes para mudancas de comportamento.
+- [ ] Nao inclui segredos no codigo.
 
-## Como testar localmente
+## Como validar localmente
 
 ```bash
 npm install
 npm test
 ```
 
-Para teste manual da API:
+Para teste manual:
 
 ```bash
 npm start
 ```
 
-E utilize a collection em `postman/`.
+Para validar fluxo Postman:
+
+```bash
+npm run test:postman
+```

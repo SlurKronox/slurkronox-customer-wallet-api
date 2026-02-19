@@ -2,98 +2,77 @@
 
 ## Requisitos
 
-- Node.js 20+ (recomendado usar `.nvmrc`)
+- Node.js 20+ (usar `.nvmrc`)
 - npm 10+
 
 ## Scripts
 
-- `npm run dev`: sobe com `nodemon`.
-- `npm start`: sobe servidor normal.
-- `npm test`: executa suite automatizada.
-- `npm run test:postman`: executa collection Postman (requer API em execucao).
+- `npm run dev`: desenvolvimento com `node --watch`
+- `npm start`: executa API
+- `npm test`: suite automatizada
+- `npm run test:postman`: executa collection Postman (API deve estar em execucao)
 
-## Configuracao de porta
+## Configuracao
 
-Arquivo:
-
-- `src/config/default.json`
-
-Exemplo:
+Arquivo: `src/config/default.json`
 
 ```json
 {
   "server": {
     "port": 3000
+  },
+  "security": {
+    "rateLimit": {
+      "windowMs": 900000,
+      "max": 500
+    }
   }
 }
 ```
 
-Override por variavel de ambiente:
+Override de porta (PowerShell):
 
 ```powershell
 $env:PORT = "4000"
 npm start
 ```
 
-## Healthcheck
+## Comportamento de inicializacao
 
-Use:
+- Se a porta configurada estiver em uso e `PORT` nao for fixa, a API tenta a proxima porta (maximo 20 tentativas).
+- Se `PORT` for fixa e estiver em uso, o processo encerra com erro.
 
-- `GET /api/v1/health`
+## Observabilidade basica
 
-Objetivo:
+- Logs com timestamp e nivel.
+- `requestId` em todas as respostas e erros.
+- Healthcheck em `GET /api/v1/health`.
 
-- validar disponibilidade da API e metadados de runtime.
+## Seguranca basica
 
-## Persistencia
-
-- Usuarios: memoria local (nao persistente).
-- Customers: memoria local carregada de `customer-wallets.json`.
-
-Ao reiniciar o servidor, os dados voltam ao estado inicial.
-
-## Logs
-
-Atualmente:
-
-- log de startup (`Servidor rodando na porta X`).
-- erros de inicializacao de porta.
-
-Nao ha logging estruturado nesta versao.
+- `helmet` habilitado.
+- `express-rate-limit` habilitado.
+- Resposta `500` sem exposicao de stack para o cliente.
 
 ## Troubleshooting
 
-### Porta em uso (`EADDRINUSE`)
+### `404` inesperado
 
-1. Se `PORT` estiver fixa, troque para outra porta livre.
-2. Sem `PORT` fixa, o servidor tenta automaticamente a proxima porta.
-3. Se o range `3000-3020` estiver ocupado, o processo encerra.
+1. confirme prefixo `/api/v1`
+2. confirme metodo HTTP correto
+3. valide URL no Postman/collection
 
-### Erro 404 em rota valida
+### `400` de validacao
 
-Checklist:
+1. verifique campos obrigatorios
+2. remova campos nao permitidos
+3. confirme formato dos dados (`email`, `state`, etc.)
 
-1. Confirme se o prefixo `/api/v1` foi usado.
-2. Confirme metodo HTTP correto.
-3. Confirme que o servidor iniciou sem erro.
+### `429` limite excedido
 
-### Erro 400 de validacao
+1. aguarde a janela de rate limit
+2. reduza frequencia de chamadas por IP
 
-Checklist:
+### Encerramento da API
 
-1. Verifique campos obrigatorios.
-2. Verifique tipos (`boolean`, `string`, `email`, etc.).
-3. Consulte `docs/API.md` ou `docs/openapi.yaml`.
-
-## Operacao com Postman
-
-1. Importe a collection e o environment da pasta `postman/`.
-2. Ajuste `baseUrl` para a porta atual.
-3. Execute a collection completa para smoke test.
-
-## Evolucao recomendada
-
-1. Adicionar persistencia real (PostgreSQL/MongoDB).
-2. Adicionar autenticacao e autorizacao.
-3. Adicionar logging estruturado e observabilidade.
-4. Adicionar testes de integracao com cenarios de erro mais amplos.
+Em `SIGINT`/`SIGTERM`, a API fecha conexoes de forma graciosa.

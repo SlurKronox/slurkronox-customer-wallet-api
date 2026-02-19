@@ -19,13 +19,15 @@ test('deve responder status de saude da API', async () => {
     const resposta = await fetch(`${baseUrl}/api/v1/health`);
 
     assert.equal(resposta.status, 200);
+    assert.ok(resposta.headers.get('x-request-id'));
     const payload = await resposta.json();
+    const dados = payload.dados;
 
-    assert.equal(payload.status, 'ok');
-    assert.equal(payload.servico, 'kronox-customer-wallet-core');
-    assert.equal(payload.versao, version);
-    assert.ok(typeof payload.timestamp === 'string');
-    assert.ok(payload.timestamp.includes('T'));
+    assert.equal(dados.status, 'ok');
+    assert.equal(dados.servico, 'kronox-customer-wallet-core');
+    assert.equal(dados.versao, version);
+    assert.ok(typeof dados.timestamp === 'string');
+    assert.ok(dados.timestamp.includes('T'));
   } finally {
     servidor.close();
     await once(servidor, 'close');

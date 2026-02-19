@@ -1,5 +1,5 @@
 const { usuariosServico } = require('../services');
-const { ErroHttp } = require('../../compartilhado');
+const { ErroHttp, sucesso } = require('../../compartilhado');
 
 function parsearIdUsuario(req) {
   const id = Number(req.params.id);
@@ -12,7 +12,7 @@ function parsearIdUsuario(req) {
 function listarUsuarios(req, res, next) {
   try {
     const usuarios = usuariosServico.listarUsuarios();
-    res.status(200).json(usuarios);
+    sucesso(res, 200, usuarios, { total: usuarios.length });
   } catch (err) {
     next(err);
   }
@@ -22,7 +22,7 @@ function obterUsuario(req, res, next) {
   try {
     const id = parsearIdUsuario(req);
     const usuario = usuariosServico.obterUsuarioPorId(id);
-    res.status(200).json(usuario);
+    sucesso(res, 200, usuario);
   } catch (err) {
     next(err);
   }
@@ -31,7 +31,7 @@ function obterUsuario(req, res, next) {
 function criarUsuario(req, res, next) {
   try {
     const usuario = usuariosServico.criarUsuario(req.body);
-    res.status(201).json(usuario);
+    sucesso(res, 201, usuario);
   } catch (err) {
     next(err);
   }
@@ -41,7 +41,7 @@ function atualizarUsuario(req, res, next) {
   try {
     const id = parsearIdUsuario(req);
     const usuario = usuariosServico.atualizarUsuario(id, req.body);
-    res.status(200).json(usuario);
+    sucesso(res, 200, usuario);
   } catch (err) {
     next(err);
   }
@@ -51,7 +51,7 @@ function atualizarParcialUsuario(req, res, next) {
   try {
     const id = parsearIdUsuario(req);
     const usuario = usuariosServico.atualizarParcialUsuario(id, req.body);
-    res.status(200).json(usuario);
+    sucesso(res, 200, usuario);
   } catch (err) {
     next(err);
   }

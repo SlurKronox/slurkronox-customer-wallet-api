@@ -20,6 +20,27 @@ function obterPorta() {
   return 3000;
 }
 
-const porta = obterPorta();
+function obterRateLimitConfig() {
+  const padrao = {
+    windowMs: 15 * 60 * 1000,
+    max: 500,
+  };
 
-module.exports = { porta };
+  if (!config.has('security.rateLimit')) {
+    return padrao;
+  }
+
+  const origem = config.get('security.rateLimit');
+  const windowMs = Number(origem.windowMs);
+  const max = Number(origem.max);
+
+  return {
+    windowMs: Number.isInteger(windowMs) && windowMs > 0 ? windowMs : padrao.windowMs,
+    max: Number.isInteger(max) && max > 0 ? max : padrao.max,
+  };
+}
+
+const porta = obterPorta();
+const rateLimitConfig = obterRateLimitConfig();
+
+module.exports = { porta, rateLimitConfig };

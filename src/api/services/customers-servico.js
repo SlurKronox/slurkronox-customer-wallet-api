@@ -29,6 +29,10 @@ function criarCustomer(payload) {
     throw new ErroHttp(409, 'Id de customer ja existe');
   }
 
+  if (customersRepositorio.obterPorEmail(dados.email)) {
+    throw new ErroHttp(409, 'Email de customer ja esta em uso');
+  }
+
   return customersRepositorio.criar(dados);
 }
 
@@ -38,10 +42,19 @@ function atualizarCustomer(id, payload) {
     throw new ErroHttp(400, 'Erro de validacao', erros);
   }
 
-  const customer = customersRepositorio.substituir(id, dados);
-  if (!customer) {
+  const atual = customersRepositorio.obterPorId(id);
+  if (!atual) {
     throw new ErroHttp(404, 'Customer nao encontrado');
   }
+
+  if (dados.email && dados.email !== atual.email) {
+    const existente = customersRepositorio.obterPorEmail(dados.email);
+    if (existente) {
+      throw new ErroHttp(409, 'Email de customer ja esta em uso');
+    }
+  }
+
+  const customer = customersRepositorio.substituir(id, dados);
 
   return customer;
 }
@@ -52,10 +65,19 @@ function atualizarParcialCustomer(id, payload) {
     throw new ErroHttp(400, 'Erro de validacao', erros);
   }
 
-  const customer = customersRepositorio.atualizarParcial(id, dados);
-  if (!customer) {
+  const atual = customersRepositorio.obterPorId(id);
+  if (!atual) {
     throw new ErroHttp(404, 'Customer nao encontrado');
   }
+
+  if (dados.email && dados.email !== atual.email) {
+    const existente = customersRepositorio.obterPorEmail(dados.email);
+    if (existente) {
+      throw new ErroHttp(409, 'Email de customer ja esta em uso');
+    }
+  }
+
+  const customer = customersRepositorio.atualizarParcial(id, dados);
 
   return customer;
 }

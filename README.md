@@ -1,42 +1,41 @@
 # Kronox Customer Wallet Core API
 
-API REST em Node.js + Express para gerenciamento de usuarios e customers,
-com arquitetura em camadas, validacao de dados e documentacao tecnica.
+API REST em Node.js + Express para gerenciamento de usuarios e customers, com
+foco em simplicidade, seguranca basica e organizacao por camadas.
 
 ## Sumario
 
 - [Visao geral](#visao-geral)
-- [Tecnologias](#tecnologias)
-- [Estrutura](#estrutura)
-- [Como executar](#como-executar)
+- [Stack tecnica](#stack-tecnica)
+- [Estrutura do projeto](#estrutura-do-projeto)
+- [Executando localmente](#executando-localmente)
+- [Seguranca e confiabilidade](#seguranca-e-confiabilidade)
+- [Contrato de resposta](#contrato-de-resposta)
+- [Endpoints](#endpoints)
 - [Testes](#testes)
-- [Configuracao](#configuracao)
-- [API (v1)](#api-v1)
 - [Postman](#postman)
-- [Documentacao](#documentacao)
-- [Qualidade e governanca](#qualidade-e-governanca)
+- [Documentacao completa](#documentacao-completa)
 
 ## Visao geral
 
-Principais entregas do projeto:
+Principais capacidades da API:
 
-- CRUD completo de usuarios (memoria).
-- CRUD completo de customers (memoria com carga inicial de JSON).
-- Endpoint de healthcheck (`GET /api/v1/health`).
-- Tratamento de erros HTTP padronizado.
-- Testes automatizados de API com `node:test`.
-- Colecao Postman para validacao ponta a ponta.
+- CRUD completo de usuarios em memoria.
+- CRUD completo de customers em memoria (com carga inicial por JSON de referencia).
+- Healthcheck em `GET /api/v1/health`.
+- Validacao de payload com bloqueio de campos desconhecidos.
+- Erros HTTP padronizados com `requestId`.
 
-## Tecnologias
+## Stack tecnica
 
 - Node.js (CommonJS)
 - Express
-- body-parser
-- config
-- nodemon
-- node:test
+- `config`
+- `helmet`
+- `express-rate-limit`
+- `node:test` para testes automatizados
 
-## Estrutura
+## Estrutura do projeto
 
 ```text
 src/
@@ -45,105 +44,89 @@ src/
   api/
     rotas-api.js
     routes/
-      health.js
-      usuarios-rotas.js
-      customers.js
-      index.js
     controllers/
-      health-controlador.js
-      usuarios-controlador.js
-      customers.js
-      index.js
     services/
-      usuarios-servico.js
-      customers-servico.js
-      index.js
     data/
-      usuarios-repositorio.js
-      customers-repositorio.js
-      index.js
       referencias/
-        customer-wallets.json
-        materiais-tcc.md
     validators/
-      usuarios-validador.js
-      customers-validador.js
-      index.js
-  config/
-    default.json
-    servidor.config.js
-    express.js
-    index.js
   compartilhado/
     erros/
     intermediarios/
+  config/
 tests/
 postman/
 docs/
 ```
 
-## Como executar
+## Executando localmente
 
-### 1) Instalar dependencias
+### Instalar dependencias
 
 ```bash
 npm install
 ```
 
-### 2) Ambiente de desenvolvimento (hot reload)
+### Modo desenvolvimento
 
 ```bash
 npm run dev
 ```
 
-### 3) Ambiente normal
+### Modo normal
 
 ```bash
 npm start
 ```
 
-## Testes
-
-Executar suite automatizada:
+### Rodar testes
 
 ```bash
 npm test
 ```
 
-Executar collection Postman (com API em execucao):
+## Seguranca e confiabilidade
 
-```bash
-npm run test:postman
+- `helmet` habilitado para headers de seguranca.
+- Rate limit habilitado por IP.
+- `x-request-id` em todas as respostas.
+- Tratamento de erro com mensagem segura para `500`.
+- Graceful shutdown em `SIGINT` e `SIGTERM`.
+- Fallback de porta quando `EADDRINUSE` e `PORT` nao esta fixa.
+
+## Contrato de resposta
+
+Sucesso:
+
+```json
+{
+  "dados": {},
+  "meta": {
+    "total": 1
+  }
+}
 ```
 
-## Configuracao
+`meta` aparece em endpoints de listagem.
 
-Arquivo base:
+Erro:
 
-- `src/config/default.json`
+```json
+{
+  "mensagem": "Descricao do erro",
+  "requestId": "uuid",
+  "detalhes": []
+}
+```
 
-Chave de porta:
+`detalhes` e opcional e aparece em validacoes.
 
-- `server.port`
-
-Prioridade da porta:
-
-1. `process.env.PORT` (se valida)
-2. `server.port` do config
-3. fallback `3000`
-
-Comportamento em `EADDRINUSE`:
-
-- Sem `PORT` fixa: tenta automaticamente proxima porta ate `3020`.
-- Com `PORT` fixa: encerra com erro e orientacao no console.
-
-## API (v1)
+## Endpoints
 
 Base URL local:
 
 - `http://localhost:3000/api/v1`
 
-Endpoints:
+Rotas:
 
 - `GET /health`
 - `GET /usuarios`
@@ -159,6 +142,11 @@ Endpoints:
 - `PATCH /customers/:id`
 - `DELETE /customers/:id`
 
+## Testes
+
+- Suite automatizada: `npm test`
+- Colecao Postman via CLI: `npm run test:postman`
+
 ## Postman
 
 Arquivos:
@@ -169,25 +157,18 @@ Arquivos:
 Passos:
 
 1. Importe collection e environment.
-2. Selecione o environment local.
-3. Ajuste `baseUrl` para a porta atual do servidor.
-4. Execute a collection na ordem para cenarios completos.
+2. Ajuste `baseUrl` conforme a porta ativa.
+3. Deixe a API em execucao (`npm start` ou `npm run dev`).
+4. Execute a collection na ordem.
 
-## Documentacao
+## Documentacao completa
 
-- `docs/README.md` (indice)
-- `docs/API.md` (referencia funcional)
-- `docs/openapi.yaml` (especificacao OpenAPI 3.0)
+- `docs/README.md`
+- `docs/API.md`
+- `docs/openapi.yaml`
 - `docs/ARQUITETURA.md`
 - `docs/OPERACAO.md`
 - `docs/TESTES.md`
-- `MATERIAIS-TCC.md`
-
-## Qualidade e governanca
-
-- Licenca: `LICENSE` (ISC)
-- Changelog: `CHANGELOG.md`
-- Contribuicao: `CONTRIBUTING.md`
-- Codigo de conduta: `CODE_OF_CONDUCT.md`
-- Seguranca: `SECURITY.md`
-- CI: `.github/workflows/ci.yml`
+- `CONTRIBUTING.md`
+- `SECURITY.md`
+- `CHANGELOG.md`

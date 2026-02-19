@@ -5,16 +5,8 @@ const customers = Array.isArray(customerWallets.customerWallets && customerWalle
   ? customerWallets.customerWallets.data.map((item) => ({ ...item }))
   : [];
 
-function montarPayload() {
-  return {
-    customerWallets: {
-      data: customers.map((item) => ({ ...item })),
-    },
-  };
-}
-
 function listar() {
-  return montarPayload();
+  return customers.map((item) => ({ ...item }));
 }
 
 function obterPorId(id) {
@@ -22,12 +14,18 @@ function obterPorId(id) {
   return customer ? { ...customer } : null;
 }
 
+function obterPorEmail(email) {
+  const normalizado = email.toLowerCase();
+  const customer = customers.find((item) => item.email.toLowerCase() === normalizado);
+  return customer ? { ...customer } : null;
+}
+
 function criar(dados) {
   const agora = new Date().toISOString();
   const customer = {
+    ...dados,
     id: dados.id || randomUUID(),
     createdAt: agora,
-    ...dados,
   };
 
   customers.push(customer);
@@ -81,6 +79,7 @@ function remover(id) {
 module.exports = {
   listar,
   obterPorId,
+  obterPorEmail,
   criar,
   substituir,
   atualizarParcial,

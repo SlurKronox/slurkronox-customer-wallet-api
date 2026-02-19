@@ -1,7 +1,8 @@
 const { version } = require('../../../package.json');
+const { sucesso } = require('../../compartilhado');
 
 function obterSaude(req, res) {
-  res.status(200).json({
+  sucesso(res, 200, {
     status: 'ok',
     servico: 'kronox-customer-wallet-core',
     versao: version,

@@ -1,16 +1,14 @@
 # Documentacao Tecnica
 
-Esta pasta concentra a documentacao oficial da API.
+Indice dos documentos oficiais da API:
 
-## Conteudo
+- `docs/API.md`: referencia funcional e regras de endpoints.
+- `docs/openapi.yaml`: contrato OpenAPI 3.0.
+- `docs/ARQUITETURA.md`: organizacao interna e responsabilidades.
+- `docs/OPERACAO.md`: execucao, configuracao e troubleshooting.
+- `docs/TESTES.md`: cobertura e estrategia de testes.
 
-- `docs/API.md`: referencia funcional dos endpoints.
-- `docs/openapi.yaml`: contrato OpenAPI 3.0 da API.
-- `docs/ARQUITETURA.md`: visao arquitetural e responsabilidades.
-- `docs/OPERACAO.md`: operacao local, scripts e troubleshooting.
-- `docs/TESTES.md`: estrategia e cobertura de testes.
-
-## Materiais complementares
+Materiais complementares:
 
 - `MATERIAIS-TCC.md`
 - `src/api/data/referencias/materiais-tcc.md`

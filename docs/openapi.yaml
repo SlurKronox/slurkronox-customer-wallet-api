@@ -1,8 +1,8 @@
 openapi: 3.0.3
 info:
   title: Kronox Customer Wallet Core API
-  version: 1.0.0
-  description: API para gerenciamento de usuarios e customers.
+  version: 1.1.0
+  description: API REST para gerenciamento de usuarios e customers.
 
 servers:
   - url: http://localhost:3000/api/v1
@@ -17,14 +17,16 @@ paths:
   /health:
     get:
       tags: [Health]
-      summary: Status da API
+      summary: Healthcheck da API
       responses:
         '200':
           description: API disponivel
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/HealthResponse'
+                $ref: '#/components/schemas/RespostaHealth'
+        '429':
+          $ref: '#/components/responses/ErroLimiteRequisicoes'
 
   /usuarios:
     get:
@@ -32,13 +34,13 @@ paths:
       summary: Lista usuarios
       responses:
         '200':
-          description: Lista retornada com sucesso
+          description: Lista de usuarios
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Usuario'
+                $ref: '#/components/schemas/RespostaListaUsuarios'
+        '429':
+          $ref: '#/components/responses/ErroLimiteRequisicoes'
     post:
       tags: [Usuarios]
       summary: Cria usuario
@@ -54,11 +56,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Usuario'
+                $ref: '#/components/schemas/RespostaUsuario'
         '400':
           $ref: '#/components/responses/ErroValidacao'
         '409':
           $ref: '#/components/responses/ErroConflito'
+        '429':
+          $ref: '#/components/responses/ErroLimiteRequisicoes'
 
   /usuarios/{id}:
     parameters:
@@ -72,11 +76,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Usuario'
+                $ref: '#/components/schemas/RespostaUsuario'
         '400':
           $ref: '#/components/responses/ErroPadrao'
         '404':
           $ref: '#/components/responses/ErroNaoEncontrado'
+        '429':
+          $ref: '#/components/responses/ErroLimiteRequisicoes'
     put:
       tags: [Usuarios]
       summary: Atualiza usuario (completo)
@@ -92,13 +98,15 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Usuario'
+                $ref: '#/components/schemas/RespostaUsuario'
         '400':
           $ref: '#/components/responses/ErroValidacao'
         '404':
           $ref: '#/components/responses/ErroNaoEncontrado'
         '409':
           $ref: '#/components/responses/ErroConflito'
+        '429':
+          $ref: '#/components/responses/ErroLimiteRequisicoes'
     patch:
       tags: [Usuarios]
       summary: Atualiza usuario (parcial)
@@ -114,13 +122,15 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Usuario'
+                $ref: '#/components/schemas/RespostaUsuario'
         '400':
           $ref: '#/components/responses/ErroValidacao'
         '404':
           $ref: '#/components/responses/ErroNaoEncontrado'
         '409':
           $ref: '#/components/responses/ErroConflito'
+        '429':
+          $ref: '#/components/responses/ErroLimiteRequisicoes'
     delete:
       tags: [Usuarios]
       summary: Remove usuario
@@ -131,6 +141,8 @@ paths:
           $ref: '#/components/responses/ErroPadrao'
         '404':
           $ref: '#/components/responses/ErroNaoEncontrado'
+        '429':
+          $ref: '#/components/responses/ErroLimiteRequisicoes'
 
   /customers:
     get:
@@ -138,11 +150,13 @@ paths:
       summary: Lista customers
       responses:
         '200':
-          description: Lista retornada com sucesso
+          description: Lista de customers
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CustomersPayload'
+                $ref: '#/components/schemas/RespostaListaCustomers'
+        '429':
+          $ref: '#/components/responses/ErroLimiteRequisicoes'
     post:
       tags: [Customers]
       summary: Cria customer
@@ -158,11 +172,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Customer'
+                $ref: '#/components/schemas/RespostaCustomer'
         '400':
           $ref: '#/components/responses/ErroValidacao'
         '409':
           $ref: '#/components/responses/ErroConflito'
+        '429':
+          $ref: '#/components/responses/ErroLimiteRequisicoes'
 
   /customers/{id}:
     parameters:
@@ -176,11 +192,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Customer'
+                $ref: '#/components/schemas/RespostaCustomer'
         '400':
           $ref: '#/components/responses/ErroPadrao'
         '404':
           $ref: '#/components/responses/ErroNaoEncontrado'
+        '429':
+          $ref: '#/components/responses/ErroLimiteRequisicoes'
     put:
       tags: [Customers]
       summary: Atualiza customer (completo)
@@ -196,11 +214,15 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Customer'
+                $ref: '#/components/schemas/RespostaCustomer'
         '400':
           $ref: '#/components/responses/ErroValidacao'
         '404':
           $ref: '#/components/responses/ErroNaoEncontrado'
+        '409':
+          $ref: '#/components/responses/ErroConflito'
+        '429':
+          $ref: '#/components/responses/ErroLimiteRequisicoes'
     patch:
       tags: [Customers]
       summary: Atualiza customer (parcial)
@@ -216,11 +238,15 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Customer'
+                $ref: '#/components/schemas/RespostaCustomer'
         '400':
           $ref: '#/components/responses/ErroValidacao'
         '404':
           $ref: '#/components/responses/ErroNaoEncontrado'
+        '409':
+          $ref: '#/components/responses/ErroConflito'
+        '429':
+          $ref: '#/components/responses/ErroLimiteRequisicoes'
     delete:
       tags: [Customers]
       summary: Remove customer
@@ -231,6 +257,8 @@ paths:
           $ref: '#/components/responses/ErroPadrao'
         '404':
           $ref: '#/components/responses/ErroNaoEncontrado'
+        '429':
+          $ref: '#/components/responses/ErroLimiteRequisicoes'
 
 components:
   parameters:
@@ -255,28 +283,42 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/Erro'
+            $ref: '#/components/schemas/ErroPadrao'
     ErroNaoEncontrado:
       description: Recurso nao encontrado
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/Erro'
+            $ref: '#/components/schemas/ErroPadrao'
     ErroConflito:
       description: Conflito de dados
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/Erro'
+            $ref: '#/components/schemas/ErroPadrao'
     ErroValidacao:
       description: Erro de validacao
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/ErroComDetalhes'
+    ErroLimiteRequisicoes:
+      description: Limite de requisicoes excedido
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErroPadrao'
 
   schemas:
-    HealthResponse:
+    MetaLista:
+      type: object
+      properties:
+        total:
+          type: integer
+          example: 3
+      required: [total]
+
+    HealthData:
       type: object
       properties:
         status:
@@ -287,7 +329,7 @@ components:
           example: kronox-customer-wallet-core
         versao:
           type: string
-          example: 1.0.0
+          example: 1.1.0
         ambiente:
           type: string
           example: development
@@ -295,6 +337,13 @@ components:
           type: string
           format: date-time
       required: [status, servico, versao, ambiente, timestamp]
+
+    RespostaHealth:
+      type: object
+      properties:
+        dados:
+          $ref: '#/components/schemas/HealthData'
+      required: [dados]
 
     Usuario:
       type: object
@@ -322,6 +371,24 @@ components:
           type: string
           format: date-time
       required: [id, nome, email, papel, ativo, criadoEm, atualizadoEm]
+
+    RespostaUsuario:
+      type: object
+      properties:
+        dados:
+          $ref: '#/components/schemas/Usuario'
+      required: [dados]
+
+    RespostaListaUsuarios:
+      type: object
+      properties:
+        dados:
+          type: array
+          items:
+            $ref: '#/components/schemas/Usuario'
+        meta:
+          $ref: '#/components/schemas/MetaLista'
+      required: [dados, meta]
 
     UsuarioCriacao:
       type: object
@@ -403,6 +470,24 @@ components:
           format: date-time
       required: [id, name, email, createdAt]
 
+    RespostaCustomer:
+      type: object
+      properties:
+        dados:
+          $ref: '#/components/schemas/Customer'
+      required: [dados]
+
+    RespostaListaCustomers:
+      type: object
+      properties:
+        dados:
+          type: array
+          items:
+            $ref: '#/components/schemas/Customer'
+        meta:
+          $ref: '#/components/schemas/MetaLista'
+      required: [dados, meta]
+
     CustomerCriacao:
       type: object
       properties:
@@ -480,30 +565,20 @@ components:
           maxLength: 2
       minProperties: 1
 
-    CustomersPayload:
-      type: object
-      properties:
-        customerWallets:
-          type: object
-          properties:
-            data:
-              type: array
-              items:
-                $ref: '#/components/schemas/Customer'
-          required: [data]
-      required: [customerWallets]
-
-    Erro:
+    ErroPadrao:
       type: object
       properties:
         mensagem:
           type: string
           example: Nao encontrado
-      required: [mensagem]
+        requestId:
+          type: string
+          format: uuid
+      required: [mensagem, requestId]
 
     ErroComDetalhes:
       allOf:
-        - $ref: '#/components/schemas/Erro'
+        - $ref: '#/components/schemas/ErroPadrao'
         - type: object
           properties:
             detalhes:

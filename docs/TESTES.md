@@ -1,10 +1,10 @@
 # Estrategia de Testes
 
-## Stack de testes
+## Stack
 
-- Runner: `node:test`
-- Assertivas: `node:assert/strict`
-- HTTP client: `fetch` nativo do Node
+- `node:test` (runner)
+- `node:assert/strict` (assertivas)
+- `fetch` nativo para chamadas HTTP
 
 ## Suites atuais
 
@@ -12,38 +12,37 @@
 - `tests/usuarios.api.test.js`
 - `tests/customers.api.test.js`
 
-## Cobertura funcional atual
+## Cobertura atual
 
 ### Health
 
-- `GET /api/v1/health` retorna `200` e payload esperado.
+- `GET /health` (`200`)
+- validacao de contrato e `x-request-id`
 
 ### Usuarios
 
-- listagem inicial
-- criacao
-- busca por id
-- exclusao
+- fluxo basico CRUD (`GET`, `POST`, `GET/:id`, `DELETE`)
+- conflito de email (`409`)
+- validacao de campo desconhecido (`400`)
 
 ### Customers
 
-- listagem
-- criacao
-- busca por id
-- atualizacao completa (PUT)
-- atualizacao parcial (PATCH)
-- exclusao
-- cenarios negativos (`404` e id invalido)
+- fluxo completo CRUD (`GET`, `POST`, `GET/:id`, `PUT`, `PATCH`, `DELETE`)
+- `404` para id inexistente
+- `400` para id invalido
+- `400` para campo desconhecido
+- `409` para id duplicado
+- `409` para email duplicado
 
-## Como executar
+## Execucao
 
 ```bash
 npm test
 ```
 
-## Smoke test via Postman/Newman
+## Smoke test de integracao
 
-Collection:
+Collection Postman:
 
 - `postman/Kronox-Customer-Wallet-Core.postman_collection.json`
 
@@ -51,14 +50,14 @@ Environment:
 
 - `postman/Kronox-Customer-Wallet-Core.postman_environment.json`
 
-Execucao manual:
+Execucao:
 
 ```bash
-npx --yes newman run postman/Kronox-Customer-Wallet-Core.postman_collection.json -e postman/Kronox-Customer-Wallet-Core.postman_environment.json
+npm run test:postman
 ```
 
-## Gaps planejados
+## Proximos passos recomendados
 
-- testes de validacao detalhada para todos os campos opcionais
-- testes de carga e concorrencia
-- cobertura de observabilidade (quando existir logging estruturado)
+- adicionar testes de carga
+- adicionar testes de concorrencia
+- adicionar testes com banco real quando houver persistencia
