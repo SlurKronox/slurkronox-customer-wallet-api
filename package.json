@@ -7,7 +7,7 @@
     "dev": "node --watch src/servidor.js",
     "start": "node src/servidor.js",
     "test": "node --test",
-    "test:postman": "npx --yes newman run postman/Kronox-Customer-Wallet-Core.postman_collection.json -e postman/Kronox-Customer-Wallet-Core.postman_environment.json"
+    "test:postman": "node --no-deprecation ./node_modules/newman/bin/newman.js run postman/Kronox-Customer-Wallet-Core.postman_collection.json -e postman/Kronox-Customer-Wallet-Core.postman_environment.json"
   },
   "keywords": [
     "api",
@@ -25,5 +25,8 @@
     "express": "^4.22.1",
     "express-rate-limit": "^8.2.1",
     "helmet": "^8.1.0"
+  },
+  "devDependencies": {
+    "newman": "^6.2.2"
   }
 }

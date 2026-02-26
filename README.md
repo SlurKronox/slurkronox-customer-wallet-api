@@ -171,6 +171,5 @@ Passos:
 - `docs/ARQUITETURA.md`
 - `docs/OPERACAO.md`
 - `docs/TESTES.md`
-- `CONTRIBUTING.md`
 - `SECURITY.md`
 - `CHANGELOG.md`
